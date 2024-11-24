@@ -18,7 +18,7 @@ func NewCmdConfig () (*cobra.Command, error) {
 		Example: heredoc.Doc(`
 			$ rr config show
 			$ rr config default -n <group name>
-		`)
+		`),
 	}
 
 	cmd.AddCommand(defaultCmd.NewCmdConfigDefault())
