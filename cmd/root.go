@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/MakeNowJust/heredoc"
+	CmdConfig "github.com/msetsma/RepoRover/cmd/config"
+	CmdGroup "github.com/msetsma/RepoRover/cmd/group"
+	"github.com/msetsma/RepoRover/core/util"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +18,7 @@ const (
 	exitPending exitCode = 8
 )
 
-func NewCmdRoot() (*cobra.Command, error) {
+func CmdRoot(tool *util.CmdTool) (*cobra.Command, error) {
 	// rootCmd represents the base command when called without any subcommands
 	cmd := &cobra.Command{
 		Use:   "rr <command> <subcommand> [flags]",
@@ -49,14 +50,17 @@ func NewCmdRoot() (*cobra.Command, error) {
 		ID:    "status",
 		Title: "status commands",
 	})
-	// Child commands
-	// cmd.AddCommand(versionCmd.NewCmdVersion(f, version, buildDate))
+	// Example adding commands
+	cmd.AddCommand(CmdConfig.NewCmdConfig(tool))
+	cmd.AddCommand(CmdGroup.NewCmdGroup(tool))
+
+	//
 
 	return cmd, nil
 }
 
-func Execute() exitCode {
-	root, err := NewCmdRoot()
+func Run(tool *util.CmdTool) exitCode {
+	root, err := CmdRoot(tool)
 	if err != nil {
 		return exitError
 	}
@@ -64,5 +68,5 @@ func Execute() exitCode {
 	if err != nil {
 		return exitError
 	}
-    return exitOK
+	return exitOK
 }

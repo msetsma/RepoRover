@@ -1,4 +1,4 @@
-package core
+package storage
 
 import (
 	"database/sql"
@@ -9,7 +9,6 @@ import (
 	"time"
 
 	_ "github.com/mattn/go-sqlite3" // SQLite driver
-	"github.com/msetsma/RepoRover/models"
 )
 
 // Database struct to manage the SQLite connection

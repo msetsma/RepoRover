@@ -1,16 +1,35 @@
-package core
+package azure
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/msetsma/RepoRover/models"
 )
 
+type Repository struct {
+	ID            string            `json:"id"`
+	Name          string            `json:"name"`
+	DefaultBranch string            `json:"defaultBranch"`
+	RemoteURL     string            `json:"remoteUrl"`
+	LastUpdated   time.Time         `json:"lastUpdated"`
+	Languages     map[string]uint64 `json:"languages"`
+}
+
+// ActiveRepository represents a repository with its activity count
+type ActiveRepository struct {
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	ActivityCount int    `json:"activity_count"`
+}
+
+// RepositoriesResponse represents the response from Azure DevOps API
+type RepositoriesResponse struct {
+	Value []Repository `json:"value"`
+}
+
 // FetchAdditionalRepoData fetches detailed information about a repository
-func FetchAdditionalRepoData(org, project, pat, repoID string) (*models.Repository, error) {
+func FetchAdditionalRepoData(org, project, pat, repoID string) (*Repository, error) {
 	url := fmt.Sprintf("https://dev.azure.com/%s/%s/_apis/git/repositories/%s?api-version=7.1-preview.1", org, project, repoID)
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -30,7 +49,7 @@ func FetchAdditionalRepoData(org, project, pat, repoID string) (*models.Reposito
 		return nil, fmt.Errorf("failed to fetch repository data: %s", resp.Status)
 	}
 
-	var repo models.Repository
+	var repo Repository
 	if err := json.NewDecoder(resp.Body).Decode(&repo); err != nil {
 		return nil, err
 	}
@@ -42,7 +61,7 @@ func FetchAdditionalRepoData(org, project, pat, repoID string) (*models.Reposito
 }
 
 // FetchRepositories retrieves repositories from Azure DevOps
-func FetchRepositories(org, project, pat string) ([]models.Repository, error) {
+func FetchRepositories(org, project, pat string) ([]Repository, error) {
 	// Azure DevOps REST API URL
 	url := fmt.Sprintf("https://dev.azure.com/%s/%s/_apis/git/repositories?api-version=7.1-preview.1", org, project)
 
@@ -64,7 +83,7 @@ func FetchRepositories(org, project, pat string) ([]models.Repository, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to fetch repositories: %s", resp.Status)
 	}
-	var reposResponse models.RepositoriesResponse
+	var reposResponse RepositoriesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&reposResponse); err != nil {
 		return nil, err
 	}

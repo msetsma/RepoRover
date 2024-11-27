@@ -1,25 +1,25 @@
 package group
 
 import (
-	"fmt"
-
-	defaultCmd "github.com/msetsma/RepoRover/cmd/config/default"
-	showCmd "github.com/msetsma/RepoRover/cmd/config/show"
-	"github.com/msetsma/RepoRover/core"
+	initGroupCmd "github.com/msetsma/RepoRover/cmd/group/init"
+	"github.com/MakeNowJust/heredoc"
+	"github.com/msetsma/RepoRover/core/util"
 	"github.com/spf13/cobra"
 )
 
-func NewCmdGroup () *cobra.Command {
+func NewCmdGroup(tool *util.CmdTool) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "config <command>",
-		Short: "Manage config",
-		Long:  `Make changes to the configuration of RepoRover`,
+		Use:   "group <command>",
+		Short: "Manage groups",
+		Long:  `Make changes, get information on groups.`,
 		Example: heredoc.Doc(`
 			$ rr group list
 			$ rr group delete -n <group name>
-		`)
+		`),
 		GroupID: "group",
-	},
+	}
 
+	cmd.AddCommand(initGroupCmd.CmdGroupInit(tool))
 
+	return cmd
 }
